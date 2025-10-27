@@ -29,20 +29,39 @@
 		1E462AE92EA6C4950034EF78 /* WRKDUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WRKDUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1E462B102EA6D85D0034EF78 /* Exceptions for "WRKD" folder in "WRKDTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Assets/RushDriver-Italic.otf",
+			);
+			target = 1E462ADE2EA6C4950034EF78 /* WRKDTests */;
+		};
+		1E462B112EA6D85D0034EF78 /* Exceptions for "WRKD" folder in "WRKDUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Assets/RushDriver-Italic.otf",
+			);
+			target = 1E462AE82EA6C4950034EF78 /* WRKDUITests */;
+		};
+		1E462B152EA6D8D70034EF78 /* Exceptions for "WRKD" folder in "WRKD" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1E462AD12EA6C4930034EF78 /* WRKD */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1E462AD42EA6C4930034EF78 /* WRKD */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1E462B152EA6D8D70034EF78 /* Exceptions for "WRKD" folder in "WRKD" target */,
+				1E462B102EA6D85D0034EF78 /* Exceptions for "WRKD" folder in "WRKDTests" target */,
+				1E462B112EA6D85D0034EF78 /* Exceptions for "WRKD" folder in "WRKDUITests" target */,
+			);
 			path = WRKD;
-			sourceTree = "<group>";
-		};
-		1E462AE22EA6C4950034EF78 /* WRKDTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = WRKDTests;
-			sourceTree = "<group>";
-		};
-		1E462AEC2EA6C4950034EF78 /* WRKDUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = WRKDUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -76,8 +95,6 @@
 			isa = PBXGroup;
 			children = (
 				1E462AD42EA6C4930034EF78 /* WRKD */,
-				1E462AE22EA6C4950034EF78 /* WRKDTests */,
-				1E462AEC2EA6C4950034EF78 /* WRKDUITests */,
 				1E462AD32EA6C4930034EF78 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -130,9 +147,6 @@
 			dependencies = (
 				1E462AE12EA6C4950034EF78 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				1E462AE22EA6C4950034EF78 /* WRKDTests */,
-			);
 			name = WRKDTests;
 			packageProductDependencies = (
 			);
@@ -152,9 +166,6 @@
 			);
 			dependencies = (
 				1E462AEB2EA6C4950034EF78 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				1E462AEC2EA6C4950034EF78 /* WRKDUITests */,
 			);
 			name = WRKDUITests;
 			packageProductDependencies = (
@@ -400,6 +411,7 @@
 				DEVELOPMENT_TEAM = 22PRLCDTWD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WRKD/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -432,6 +444,7 @@
 				DEVELOPMENT_TEAM = 22PRLCDTWD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WRKD/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
