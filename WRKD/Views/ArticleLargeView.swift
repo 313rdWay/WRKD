@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ArticleLargeView: View {
+    @StateObject var vm = RSSFeedViewModel()
+
     var body: some View {
         ZStack {
             Image("GCWLogo")
