@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1E4388752EB176C400C41E81 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 1E4388742EB176C400C41E81 /* SwiftSoup */; };
+		1E4388782EB2BE0D00C41E81 /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1E4388772EB2BE0D00C41E81 /* SVGKit */; };
+		1E43887A2EB2BE0D00C41E81 /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 1E4388792EB2BE0D00C41E81 /* SVGKitSwift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		1E462AE02EA6C4950034EF78 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -71,6 +77,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E43887A2EB2BE0D00C41E81 /* SVGKitSwift in Frameworks */,
+				1E4388782EB2BE0D00C41E81 /* SVGKit in Frameworks */,
+				1E4388752EB176C400C41E81 /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,6 +138,9 @@
 			);
 			name = WRKD;
 			packageProductDependencies = (
+				1E4388742EB176C400C41E81 /* SwiftSoup */,
+				1E4388772EB2BE0D00C41E81 /* SVGKit */,
+				1E4388792EB2BE0D00C41E81 /* SVGKitSwift */,
 			);
 			productName = WRKD;
 			productReference = 1E462AD22EA6C4930034EF78 /* WRKD.app */;
@@ -206,6 +218,10 @@
 			);
 			mainGroup = 1E462AC92EA6C4930034EF78;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				1E4388732EB176C400C41E81 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				1E4388762EB2BE0D00C41E81 /* XCRemoteSwiftPackageReference "SVGKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1E462AD32EA6C4930034EF78 /* Products */;
 			projectDirPath = "";
@@ -591,6 +607,43 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1E4388732EB176C400C41E81 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.11.1;
+			};
+		};
+		1E4388762EB2BE0D00C41E81 /* XCRemoteSwiftPackageReference "SVGKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SVGKit/SVGKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1E4388742EB176C400C41E81 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1E4388732EB176C400C41E81 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
+		1E4388772EB2BE0D00C41E81 /* SVGKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1E4388762EB2BE0D00C41E81 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			productName = SVGKit;
+		};
+		1E4388792EB2BE0D00C41E81 /* SVGKitSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1E4388762EB2BE0D00C41E81 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			productName = SVGKitSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1E462ACA2EA6C4930034EF78 /* Project object */;
 }

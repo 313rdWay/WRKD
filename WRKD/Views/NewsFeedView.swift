@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct NewsFeedView: View {
+    @StateObject private var vm = RSSFeedViewModel()
+    
     let promotions: [String] = ["ALL", "WWE", "AEW", "NJPW"]
     
     @State private var selection = 0
@@ -15,6 +17,14 @@ struct NewsFeedView: View {
     
     @State var selectedTab: Int = 0
     @State private var selectedPromotion: String? = "ALL"
+    
+    var featuredArticles: [RSSItem] {
+        Array(vm.items.prefix(3)) // first 3 items
+    }
+    
+    var regularArticles: [RSSItem] {
+        Array(vm.items.dropFirst(3)) // everything after the first 3
+    }
         
     var body: some View {
         ZStack {
@@ -33,6 +43,9 @@ struct NewsFeedView: View {
             }
         
 
+        }
+        .onAppear {
+            vm.loadFeeds()
         }
     }
 }
@@ -104,10 +117,10 @@ extension NewsFeedView {
                 
                 VStack {
                     TabView(selection: $selection) {
-                        ForEach(stories, id: \.self) { index in
-                            ArticleLargeView()
+                        ForEach(featuredArticles) { article in
+                            ArticleLargeView(article: article)
                                 .padding(.bottom, 0)
-                                .tag(index)
+//                                .tag(article)
                         }
                     }
                     .tabViewStyle(.page)
@@ -118,12 +131,12 @@ extension NewsFeedView {
             
             
             VStack(alignment: .leading) {
-                Text("WWE")
+                Text("Latest News")
                     .font(.system(size: 21, weight: .semibold, design: .default))
                     .padding(.leading, 20)
                 
-                ForEach(stories, id: \.self) { index in
-                    ArticleListView()
+                ForEach(regularArticles) { article in
+                    ArticleListView(article: article)
                 }
             }
         }

@@ -8,15 +8,19 @@
 import Foundation
 import SwiftUI
 
-
 struct RSSItem: Identifiable {
     let id = UUID()
     let title: String
     let description: String
     let link: String
     let thumbnailURL: URL?
-    let logoURL: URL?
+    let sourceName: String?
+    let sourceLogoURL: URL?
     let pubDate: Date?
+    
+    // For future use
+//    let mediaURL: URL? // For podcast audio or video files
+//    let duration: TimeInterval? // For podcast length
     
     var timeAgo: String {
         guard let pubDate = pubDate else { return "Unknown" }
