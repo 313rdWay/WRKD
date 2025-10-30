@@ -57,12 +57,16 @@ struct ArticleLargeView: View {
                     .overlay(alignment: .bottom) {
                         VStack(alignment: .leading) {
                             Text(article.timeAgo)
-                                .font(.system(size: 12, weight: .regular, design: .default))
+                                .font(ArticleStyleConstants.subtitleFont)
+                                .foregroundStyle(ArticleStyleConstants.subtitleForeground)
 
                             Spacer()
 
                             Text(article.title)
-                            .font(.system(size: 18, weight: .regular, design: .default))
+                                .font(ArticleStyleConstants.titleFontLarge)
+                                .lineLimit(ArticleStyleConstants.linelimit)
+                                .foregroundStyle(ArticleStyleConstants.titleForeground)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .padding()
                     }
@@ -95,6 +99,7 @@ struct ArticleLargeView: View {
                     .offset(y: 20)
                 }
         }
+        .articleContainer()
     }
 }
 

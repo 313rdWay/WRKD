@@ -39,10 +39,7 @@ struct NewsFeedView: View {
                 
                 articlesScrollView
                 
-                
             }
-        
-
         }
         .onAppear {
             vm.loadFeeds()

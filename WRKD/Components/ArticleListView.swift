@@ -19,9 +19,6 @@ struct ArticleListView: View {
             
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
-//                    Image("FightfulLogo")
-//                        .resizable()
-//                        .frame(width: 78, height: 12)
                     if let logoURL = article.sourceLogoURL {
                         UniversalImageView(urlString: logoURL.absoluteString,
                                            size: CGSize(width: 78, height: 12)
@@ -29,13 +26,15 @@ struct ArticleListView: View {
                     }
                     
                     Text(article.title)
-                        .font(.system(size: 16, weight: .regular, design: .default))
-                        .foregroundStyle(Color("primaryText"))
+                        .font(ArticleStyleConstants.titleFontCompact)
+                        .lineLimit(ArticleStyleConstants.linelimit)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundStyle(ArticleStyleConstants.titleForeground)
 
                     
                     Text(article.timeAgo)
-                        .font(.system(size: 12, weight: .regular, design: .default))
-                        .foregroundStyle(Color("secondaryText"))
+                        .font(ArticleStyleConstants.subtitleFont)
+                        .foregroundStyle(ArticleStyleConstants.subtitleForeground)
 
                 }
                 if let thumbnailURL = article.thumbnailURL {
@@ -72,6 +71,7 @@ struct ArticleListView: View {
             }
             .padding(.horizontal)
         }
+        .articleContainer()
     }
 }
 
