@@ -87,4 +87,8 @@ struct UniversalImageView: View {
     }
 }
 
+//#Preview {
+//    UniversalImageView(urlString: "https://d1fcaprh3kb5t7.cloudfront.net/wp-content/uploads/2025/10/28113130/irs-mike-rotunda-irwin-3.jpg?v=20251029182105", size: CGSize(width: 350, height: 252))
+//}
+
 

@@ -19,26 +19,20 @@ class RSSFeedViewModel: ObservableObject {
             name: "WrestleTalk",
             logoURL: URL(string: "https://wrestletalk.com/wp-content/uploads/2021/12/logo.svg"),
             feedURL: URL(string: "https://wrestletalk.com/feed/")!,
-            categroy: .news
+            category: .news
         ),
         RSSSource(
             name: "Fightful",
             logoURL: URL(string: "https://d1fcaprh3kb5t7.cloudfront.net/wp-content/uploads/2025/06/26001949/footer-logo.svg"),
             feedURL: URL(string: "https://www.fightful.com/rss.xml")!,
-            categroy: .news
+            category: .news
         ),
         RSSSource(
             name: "Wrestling Inc",
             logoURL: URL(string: "https://www.wrestlinginc.com/img/winc-logo-color-borderless.svg"),
             feedURL: URL(string: "https://www.wrestlinginc.com/feed/")!,
-            categroy: .news
-        ),
-                RSSSource(
-                    name: "Ringside News",
-                    logoURL: URL(string: "https://b1671682.smushcdn.com/1671682/wp-content/uploads/2023/01/ringsidenews-header.png?lossy=2&strip=1&avif=1"),
-                    feedURL: URL(string: "https://www.ringsidenews.com/feed/")!,
-                    categroy: .news
-                )
+            category: .news
+        )
     ]
     
     var groupedBySource: [String: [RSSItem]] {

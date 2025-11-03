@@ -19,5 +19,5 @@ struct RSSSource: Identifiable {
     let name: String
     let logoURL: URL?
     let feedURL: URL
-    let categroy: FeedCategory
+    let category: FeedCategory
 }

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ArticleListView: View {
+    @Environment(\.openURL) private var openURL
+    
     let article: RSSItem
     
     var body: some View {
@@ -30,12 +32,12 @@ struct ArticleListView: View {
                         .lineLimit(ArticleStyleConstants.linelimit)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .foregroundStyle(ArticleStyleConstants.titleForeground)
-
+                    
                     
                     Text(article.timeAgo)
                         .font(ArticleStyleConstants.subtitleFont)
                         .foregroundStyle(ArticleStyleConstants.subtitleForeground)
-
+                    
                 }
                 if let thumbnailURL = article.thumbnailURL {
                     AsyncImage(url: thumbnailURL) { phase in

@@ -27,18 +27,20 @@ struct NewsFeedView: View {
     }
         
     var body: some View {
-        ZStack {
-            // background layer
-            Color("primaryBG")
-                .ignoresSafeArea(.all)
-            
-            VStack {
-                header
+        NavigationStack {
+            ZStack {
+                // background layer
+                Color("primaryBG")
+                    .ignoresSafeArea(.all)
                 
-                filterOptions
-                
-                articlesScrollView
-                
+                VStack {
+                    header
+                    
+                    filterOptions
+                    
+                    articlesScrollView
+                    
+                }
             }
         }
         .onAppear {
@@ -106,7 +108,7 @@ extension NewsFeedView {
     
     private var articlesScrollView: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
+            LazyVStack(alignment: .leading, spacing: 0) {
                 Text("Featured Stories")
                     .font(.system(size: 21, weight: .semibold, design: .default))
                     .padding(.bottom, -50)
@@ -115,9 +117,30 @@ extension NewsFeedView {
                 VStack {
                     TabView(selection: $selection) {
                         ForEach(featuredArticles) { article in
-                            ArticleLargeView(article: article)
-                                .padding(.bottom, 0)
-//                                .tag(article)
+                            if ArticleWebView.makeURL(from: article.link) != nil {
+                                NavigationLink {
+                                    ArticleWebView(urlString: article.link)
+                                } label: {
+                                    ArticleLargeView(article: article)
+                                }
+                                .buttonStyle(.plain)
+                            } else {
+                                // fallback if it's invalid
+                                ArticleLargeView(article: article)
+                                    .onTapGesture {
+                                        print("⚠️ Invalid or missing URL for \(article.title)")
+                                    }
+                            }
+                            //                            NavigationLink {
+//                                if let url = URL(string: article.link.trimmingCharacters(in: .whitespacesAndNewlines)) {
+//                                    ArticleWebView(urlString: url)
+//                                } else {
+//                                    Text("Invalid URL")
+//                                }
+//                            } label: {
+//                                ArticleLargeView(article: article)
+//                                    .padding(.bottom, 0)
+//                            }
                         }
                     }
                     .tabViewStyle(.page)
@@ -133,7 +156,28 @@ extension NewsFeedView {
                     .padding(.leading, 20)
                 
                 ForEach(regularArticles) { article in
-                    ArticleListView(article: article)
+                    if ArticleWebView.makeURL(from: article.link) != nil {
+                        NavigationLink {
+                            ArticleWebView(urlString: article.link)
+                        } label: {
+                            ArticleListView(article: article)
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        ArticleListView(article: article)
+                            .onTapGesture {
+                                print("⚠️ Invalid or missing URL for \(article.title)")
+                            }
+                    }
+//                    NavigationLink(destination: {
+//                        if let url = URL(string: article.link.trimmingCharacters(in: .whitespacesAndNewlines)) {
+//                            ArticleWebView(url: url)
+//                        } else {
+//                            Text("Invalid URL")
+//                        }
+//                    }) {
+//                        ArticleListView(article: article)
+//                    }
                 }
             }
         }

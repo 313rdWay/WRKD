@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ArticleLargeView: View {
+    @Environment(\.openURL) private var openURL
+    
     let article: RSSItem
 
     var body: some View {
@@ -37,69 +39,69 @@ struct ArticleLargeView: View {
                         .foregroundColor(.gray.opacity(0.4))
                 }
             }
-                .frame(width: 557, height: 269)
-                .mask(
-                    RoundedRectangle(cornerRadius: 50)
-                        .fill(.blue)
-                        .frame(width: 350, height: 252)
+            .frame(width: 557, height: 269)
+            .mask(
+                RoundedRectangle(cornerRadius: 50)
+                    .frame(width: 350, height: 252)
+            )
+            .overlay(alignment: .bottom) {
+                CustomRoundedRectangle(
+                    topLeft: 0,
+                    topRight: 0,
+                    bottomLeft: 50,
+                    bottomRight: 50
                 )
+                .fill((Color("tertiaryBG")))
+                .glassEffect()
+                .frame(width: 350, height: 99)
+                
                 .overlay(alignment: .bottom) {
-                    CustomRoundedRectangle(
-                        topLeft: 0,
-                        topRight: 0,
-                        bottomLeft: 50,
-                        bottomRight: 50
-                    )
-                    .fill((Color("tertiaryBG")))
-                    .glassEffect()
-                    .frame(width: 350, height: 99)
-
-                    .overlay(alignment: .bottom) {
-                        VStack(alignment: .leading) {
-                            Text(article.timeAgo)
-                                .font(ArticleStyleConstants.subtitleFont)
-                                .foregroundStyle(ArticleStyleConstants.subtitleForeground)
-
-                            Spacer()
-
-                            Text(article.title)
-                                .font(ArticleStyleConstants.titleFontLarge)
-                                .lineLimit(ArticleStyleConstants.linelimit)
-                                .foregroundStyle(ArticleStyleConstants.titleForeground)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .padding()
-                    }
-                }
-                .overlay(alignment: .top) {
-                    HStack(spacing: 180) {
-                        Capsule()
-                            .fill(Color("tertiaryBG"))
-                            .glassEffect()
-                            .frame(width: 85, height: 22)
-                            .overlay {
-                                if let logoURL = article.sourceLogoURL {
-                                    UniversalImageView(
-                                        urlString: logoURL.absoluteString,
-                                        size: CGSize(width: 78, height: 12)
-                                    )
-                                }
-                            }
+                    VStack(alignment: .leading) {
+                        Text(article.timeAgo)
+                            .font(ArticleStyleConstants.subtitleFont)
+                            .foregroundStyle(ArticleStyleConstants.subtitleForeground)
                         
-                        Circle()
-                            .fill(Color("tertiaryBG"))
-                            .glassEffect()
-                            .frame(width: 29, height: 29)
-                            .overlay(alignment: .center) {
-                                Image("meatballsMenu")
-                                    .resizable()
-                                    .frame(width: 29, height: 29)
-                            }
+                        Spacer()
+                        
+                        Text(article.title)
+                            .font(ArticleStyleConstants.titleFontLarge)
+                            .lineLimit(ArticleStyleConstants.linelimit)
+                            .foregroundStyle(ArticleStyleConstants.titleForeground)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .offset(y: 20)
+                    .padding()
                 }
+            }
+            .overlay(alignment: .top) {
+                HStack(spacing: 180) {
+                    Capsule()
+                        .fill(Color("tertiaryBG"))
+                        .glassEffect()
+                        .frame(width: 85, height: 22)
+                        .overlay {
+                            if let logoURL = article.sourceLogoURL {
+                                UniversalImageView(
+                                    urlString: logoURL.absoluteString,
+                                    size: CGSize(width: 78, height: 12)
+                                )
+                            }
+                        }
+                    
+                    Circle()
+                        .fill(Color("tertiaryBG"))
+                        .glassEffect()
+                        .frame(width: 29, height: 29)
+                        .overlay(alignment: .center) {
+                            Image("meatballsMenu")
+                                .resizable()
+                                .frame(width: 29, height: 29)
+                        }
+                }
+                .offset(y: 20)
+            }
         }
         .articleContainer()
+
     }
 }
 
