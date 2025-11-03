@@ -44,7 +44,7 @@ struct NewsFeedView: View {
             }
         }
         .onAppear {
-            vm.loadFeeds()
+            vm.loadFeedIfNeeded()
         }
     }
 }
@@ -131,16 +131,6 @@ extension NewsFeedView {
                                         print("⚠️ Invalid or missing URL for \(article.title)")
                                     }
                             }
-                            //                            NavigationLink {
-//                                if let url = URL(string: article.link.trimmingCharacters(in: .whitespacesAndNewlines)) {
-//                                    ArticleWebView(urlString: url)
-//                                } else {
-//                                    Text("Invalid URL")
-//                                }
-//                            } label: {
-//                                ArticleLargeView(article: article)
-//                                    .padding(.bottom, 0)
-//                            }
                         }
                     }
                     .tabViewStyle(.page)
@@ -169,19 +159,14 @@ extension NewsFeedView {
                                 print("⚠️ Invalid or missing URL for \(article.title)")
                             }
                     }
-//                    NavigationLink(destination: {
-//                        if let url = URL(string: article.link.trimmingCharacters(in: .whitespacesAndNewlines)) {
-//                            ArticleWebView(url: url)
-//                        } else {
-//                            Text("Invalid URL")
-//                        }
-//                    }) {
-//                        ArticleListView(article: article)
-//                    }
                 }
             }
         }
         .scrollIndicators(.hidden)
+        .refreshable {
+            vm.hasLoadedOnce = false
+            vm.loadFeeds()
+        }
     }
 }
 

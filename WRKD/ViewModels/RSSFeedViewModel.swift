@@ -14,6 +14,8 @@ class RSSFeedViewModel: ObservableObject {
     @Published var items: [RSSItem] = []
     @Published var errorMessage: String?
     
+    @Published var hasLoadedOnce = false
+    
     let sources: [RSSSource] = [
         RSSSource(
             name: "WrestleTalk",
@@ -39,6 +41,11 @@ class RSSFeedViewModel: ObservableObject {
         Dictionary(grouping: items) { $0.sourceName ?? "Unknown" }
     }
     
+    func loadFeedIfNeeded() {
+        guard !hasLoadedOnce else { return }
+        loadFeeds()
+    }
+    
     func loadFeeds() {
         Task {
             var allItems: [RSSItem] = []
@@ -52,6 +59,7 @@ class RSSFeedViewModel: ObservableObject {
                             self.items = allItems.sorted {
                                 ($0.pubDate ?? .distantPast) > ($1.pubDate ?? .distantPast)
                             }
+                            self.hasLoadedOnce = true
                         case .failure(let error):
                             self.errorMessage = error.localizedDescription
                         }
