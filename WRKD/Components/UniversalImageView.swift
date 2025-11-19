@@ -8,12 +8,63 @@
 import SwiftUI
 import SVGKit
 import Combine
+import CryptoKit
 
 @MainActor
 class UniversalImageLoader: ObservableObject {
     @Published var image: UIImage?
 
-    static var cache = [String: UIImage]()
+//    static var cache = [String: UIImage]()
+    // Mark: - Caches
+    
+    // In memory cache (fast temporary)
+    private static let memoryCache = NSCache<NSString, UIImage>()
+    
+    // Directory on disk where we'll store images
+    private static let diskCacheDirectory: URL = {
+        let urls = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)
+        let dir = urls[0].appendingPathComponent("ImageCache", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir
+    }()
+    
+    // Generate a safe file URL for this image based on its URL string
+    private static func cacheFileURL(for urlString: String) -> URL {
+        // Use SHA256 so filenames are short & safe
+        let digest = SHA256.hash(data: Data(urlString.utf8))
+        let filename = digest.map { String(format: "%02x", $0) }.joined()
+        return diskCacheDirectory.appendingPathComponent(filename).appendingPathExtension("img")
+    }
+    
+    // Try to load from memory, the fall back to disk
+    private static func imageFromCache(for urlString: String) -> UIImage? {
+        // 1) Memory cache
+        if let image = memoryCache.object(forKey: urlString as NSString) {
+            return image
+        }
+        
+        // 2) Disk cache
+        let fileURL = cacheFileURL(for: urlString)
+        if let data = try? Data(contentsOf: fileURL),
+           let image = UIImage(data: data) {
+            // Promote to memory cache for faster next access
+            memoryCache.setObject(image, forKey: urlString as NSString)
+            return image
+        }
+        return nil
+    }
+    
+    /// Store in memory and on disk
+    private static func store(_ image: UIImage, for urlString: String) {
+        // Memory
+        memoryCache.setObject(image, forKey: urlString as NSString)
+        
+        // Disk
+        let fileURL = cacheFileURL(for: urlString)
+        if let data = image.pngData() {
+            try? data.write(to: fileURL)
+        }
+    }
 
        func load(from urlString: String) {
            guard let url = URL(string: urlString), !urlString.isEmpty else { return }
@@ -25,8 +76,8 @@ if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
 }
 #endif
 
-           // Checks if image is already cached
-           if let cached = Self.cache[urlString] {
+           // Trys to load from memory or disk cache
+           if let cached = Self.imageFromCache(for: urlString) {
                self.image = cached
                return
            }
@@ -50,6 +101,11 @@ if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
                     }
                 } else {
                     loadedImage = UIImage(data: data)
+                }
+                
+                // Stores in cache if we actually got an image
+                if let loadedImage {
+                    Self.store(loadedImage, for: urlString)
                 }
 
                 await MainActor.run {
