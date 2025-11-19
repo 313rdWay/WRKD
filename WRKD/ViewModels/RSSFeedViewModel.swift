@@ -49,6 +49,7 @@ class RSSFeedViewModel: ObservableObject {
     
     func loadFeeds() {
         Task {
+            let ogImageEnhancedSources = ["WrestleTalk", "Fightful", "Wrestling Inc"]
             var allItems: [RSSItem] = []
             
             for source in sources {
@@ -60,7 +61,7 @@ class RSSFeedViewModel: ObservableObject {
                             self.items = allItems.sorted {
                                 ($0.pubDate ?? .distantPast) > ($1.pubDate ?? .distantPast)
                             }
-                            self.enhanceWrestleTalkThumbnails()
+                            self.enhanceThumbnailsUsingOGImage(for: ogImageEnhancedSources)
                             self.hasLoadedOnce = true
                         case .failure(let error):
                             self.errorMessage = error.localizedDescription
@@ -71,16 +72,17 @@ class RSSFeedViewModel: ObservableObject {
         }
     }
     
-    func enhanceWrestleTalkThumbnails() {
+    func enhanceThumbnailsUsingOGImage(for sourceName: [String]) {
         // Work on the current items already published
         var updatedItems = self.items
 
         let group = DispatchGroup()
 
         for (index, item) in updatedItems.enumerated() {
-            // Only care about WrestleTalk items
-            guard item.sourceName == "WrestleTalk",
-                  let articleURL = URL(string: item.link) else { continue }
+            // Only care about specific sources (e.g. WrestleTalk, Fightful, Wrestling Inc)
+            guard let name = item.sourceName, sourceName.contains(name),
+                  let articleURL = URL(string: item.link)
+            else { continue }
 
             group.enter()
             URLSession.shared.dataTask(with: articleURL) { data, _, _ in
@@ -110,7 +112,7 @@ class RSSFeedViewModel: ObservableObject {
                         }
                     }
                 } catch {
-                    print("⚠️ WrestleTalk HTML parse failed:", error.localizedDescription)
+                    print("⚠️ HTML parse failed for \(name):", error.localizedDescription)
                 }
             }.resume()
         }
