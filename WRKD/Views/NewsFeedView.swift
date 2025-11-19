@@ -120,6 +120,7 @@ extension NewsFeedView {
                             if ArticleWebView.makeURL(from: article.link) != nil {
                                 NavigationLink {
                                     ArticleWebView(urlString: article.link)
+                                        .toolbar(.hidden, for: .tabBar)
                                 } label: {
                                     ArticleLargeView(article: article)
                                 }
@@ -149,6 +150,7 @@ extension NewsFeedView {
                     if ArticleWebView.makeURL(from: article.link) != nil {
                         NavigationLink {
                             ArticleWebView(urlString: article.link)
+                                .toolbar(.hidden, for: .tabBar)
                         } label: {
                             ArticleListView(article: article)
                         }
