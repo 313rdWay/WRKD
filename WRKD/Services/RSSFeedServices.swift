@@ -106,11 +106,26 @@ class RSSParser: NSObject, XMLParserDelegate {
     }
     
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        if elementName == "content:encoded", currentThumbnailURL == nil {
+//        if elementName == "content:encoded", currentThumbnailURL == nil {
+//            do {
+//                let doc = try SwiftSoup.parse(currentDescription)
+//                if let imgSrc = try doc.select("img").first()?.attr("src"), let url = URL(string: imgSrc) {
+//                    currentThumbnailURL = url
+//                }
+//            } catch {
+//                print("⚠️ SwiftSoup failed:", error.localizedDescription)
+//            }
+//        }
+        if elementName == "content:encoded" {
             do {
                 let doc = try SwiftSoup.parse(currentDescription)
-                if let imgSrc = try doc.select("img").first()?.attr("src"), let url = URL(string: imgSrc) {
+
+                if let imgSrc = try doc.select("img").first()?.attr("src"),
+                   let url = URL(string: imgSrc) {
+
+                    // Always let the article's own image override any generic feed image
                     currentThumbnailURL = url
+                    print("📸 Overriding thumbnail from content:encoded: \(imgSrc)")
                 }
             } catch {
                 print("⚠️ SwiftSoup failed:", error.localizedDescription)
@@ -160,3 +175,47 @@ func fetchRSSFeed(source: RSSSource, completion: @escaping (Result<[RSSItem], Er
     }
     task.resume()
 }
+
+//func enhanceWrestleTalkThumbnails(_ items: [RSSItem], completion: @escaping ([RSSItem]) -> Void) {
+//    
+//    var updated = items
+//    let group = DispatchGroup()
+//    
+//    for (index, item) in items.enumerated() {
+//        guard item.sourceName == "WrestleTalk", let articleURL = URL(string: item.link) else { continue }
+//        
+//        group.enter()
+//        URLSession.shared.dataTask(with: articleURL) { data, _, _ in
+//            defer { group.leave() }
+//            
+//            guard let data = data, let html = String(data: data, encoding: .utf8) else { return }
+//            
+//            do {
+//                let doc = try SwiftSoup.parse(html)
+//                
+//                // Try meta og:image first (very likely to exist)
+//                if let meta = try doc.select("meta[property=og:image]").first(),
+//                   let ogImage = try? meta.attr("content"),
+//                   let url = URL(string: ogImage) {
+//                    
+//                    let old = item
+//                    let newItem = RSSItem(
+//                        title: old.title,
+//                        description: old.description,
+//                        link: old.link,
+//                        thumbnailURL: url,
+//                        sourceName: old.sourceName,
+//                        sourceLogoURL: old.sourceLogoURL,
+//                        pubDate: old.pubDate
+//                    )
+//                    updated[index] = newItem
+//                }
+//            } catch {
+//                print("⚠️ WrestleTalk HTML parse failed:", error.localizedDescription)
+//            }
+//        }.resume()
+//    }
+//    group.notify(queue: .main) {
+//        completion(updated)
+//    }
+//}

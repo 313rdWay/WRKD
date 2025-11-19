@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import SVGKit
+import SwiftSoup
 
 @MainActor
 class RSSFeedViewModel: ObservableObject {
@@ -59,6 +60,7 @@ class RSSFeedViewModel: ObservableObject {
                             self.items = allItems.sorted {
                                 ($0.pubDate ?? .distantPast) > ($1.pubDate ?? .distantPast)
                             }
+                            self.enhanceWrestleTalkThumbnails()
                             self.hasLoadedOnce = true
                         case .failure(let error):
                             self.errorMessage = error.localizedDescription
@@ -66,6 +68,56 @@ class RSSFeedViewModel: ObservableObject {
                     }
                 }
             }
+        }
+    }
+    
+    func enhanceWrestleTalkThumbnails() {
+        // Work on the current items already published
+        var updatedItems = self.items
+
+        let group = DispatchGroup()
+
+        for (index, item) in updatedItems.enumerated() {
+            // Only care about WrestleTalk items
+            guard item.sourceName == "WrestleTalk",
+                  let articleURL = URL(string: item.link) else { continue }
+
+            group.enter()
+            URLSession.shared.dataTask(with: articleURL) { data, _, _ in
+                defer { group.leave() }
+
+                guard let data = data,
+                      let html = String(data: data, encoding: .utf8) else { return }
+
+                do {
+                    let doc = try SwiftSoup.parse(html)
+
+                    if let meta = try doc.select("meta[property=og:image]").first() {
+                        let ogImage = try meta.attr("content")
+
+                        if let url = URL(string: ogImage) {
+                            let old = item
+                            let newItem = RSSItem(
+                                title: old.title,
+                                description: old.description,
+                                link: old.link,
+                                thumbnailURL: url, // 🔁 overwrite thumbnail
+                                sourceName: old.sourceName,
+                                sourceLogoURL: old.sourceLogoURL,
+                                pubDate: old.pubDate
+                            )
+                            updatedItems[index] = newItem
+                        }
+                    }
+                } catch {
+                    print("⚠️ WrestleTalk HTML parse failed:", error.localizedDescription)
+                }
+            }.resume()
+        }
+
+        group.notify(queue: .main) {
+            // 🔁 When all WrestleTalk pages are checked, publish the enhanced list
+            self.items = updatedItems
         }
     }
 }
