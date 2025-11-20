@@ -87,6 +87,8 @@ class RSSFeedViewModel: ObservableObject {
                 
 
             case .ogImage:
+                guard let articleURL = URL(string: item.link) else { continue }
+
                 group.enter()
                 URLSession.shared.dataTask(with: articleURL) { data, _, _ in
                     defer { group.leave() }
@@ -97,22 +99,31 @@ class RSSFeedViewModel: ObservableObject {
                     do {
                         let doc = try SwiftSoup.parse(html)
 
+                        var finalURL: URL?
+
+                        // 1) Try og:image
                         if let meta = try doc.select("meta[property=og:image]").first() {
                             let ogImage = try meta.attr("content")
+                            finalURL = URL(string: ogImage)
+                        }
 
-                            if let url = URL(string: ogImage) {
-                                let old = item
-                                let newItem = RSSItem(
-                                    title: old.title,
-                                    description: old.description,
-                                    link: old.link,
-                                    thumbnailURL: url, // 🔁 override
-                                    sourceName: old.sourceName,
-                                    sourceLogoURL: old.sourceLogoURL,
-                                    pubDate: old.pubDate
-                                )
-                                updatedItems[index] = newItem
-                            }
+                        // 2) If no og:image, fall back to first <img> or YouTube iframe
+                        if finalURL == nil {
+                            finalURL = self.firstImageURL(in: html)
+                        }
+
+                        if let url = finalURL {
+                            let old = item
+                            let newItem = RSSItem(
+                                title: old.title,
+                                description: old.description,
+                                link: old.link,
+                                thumbnailURL: url,   // 🔁 override with best guess
+                                sourceName: old.sourceName,
+                                sourceLogoURL: old.sourceLogoURL,
+                                pubDate: old.pubDate
+                            )
+                            updatedItems[index] = newItem
                         }
                     } catch {
                         print("⚠️ HTML parse failed for \(name):", error.localizedDescription)
@@ -126,13 +137,53 @@ class RSSFeedViewModel: ObservableObject {
         }
     }
     
+    private func youtubeThumbnailURL(from src: String) -> URL? {
+        guard let url = URL(string: src),
+              let host = url.host,
+              host.contains("youtu") else {
+            return nil
+        }
+
+        var videoID: String?
+
+        // 1) youtu.be/{id}
+        if host.contains("youtu.be") {
+            videoID = url.pathComponents.dropFirst().first
+        }
+        // 2) youtube.com/embed/{id}
+        else if url.path.contains("/embed/") {
+            videoID = url.pathComponents.last
+        }
+        // 3) youtube.com/watch?v={id}
+        else if var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            videoID = components.queryItems?.first(where: { $0.name == "v" })?.value
+        }
+
+        guard let id = videoID else { return nil }
+
+        // Standard YouTube thumbnail URL
+        return URL(string: "https://img.youtube.com/vi/\(id)/hqdefault.jpg")
+    }
+    
     private func firstImageURL(in html: String) -> URL? {
         do {
             let doc = try SwiftSoup.parse(html)
+            
+            // Tries normal <img> first
             if let imgSrc = try doc.select("img").first()?.attr("src"),
                let url = URL(string: imgSrc) {
                 return url
             }
+            
+            // If no <img>, look for a Youtube iframe
+            if let iframeSrc = try doc
+                .select("iframe[src*=\"youtube.com\"], iframe[src*=\"youtu.be\"]")
+                .first()?
+                .attr("src"),
+               let thumbURL = youtubeThumbnailURL(from: iframeSrc) {
+                return thumbURL
+            }
+            
         } catch {
             print("⚠️ firstImageURL HTML parse failed:", error.localizedDescription)
         }
