@@ -79,6 +79,12 @@ struct ArticleLargeView: View {
                         .glassEffect()
                         .frame(width: 85, height: 22)
                         .overlay {
+                            if let assetName = article.localLogoAssetName {
+                                Image(assetName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 78, height: 12)
+                            }
                             if let logoURL = article.sourceLogoURL {
                                 UniversalImageView(
                                     urlString: logoURL.absoluteString,

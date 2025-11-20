@@ -22,6 +22,15 @@ struct RSSItem: Identifiable {
 //    let mediaURL: URL? // For podcast audio or video files
 //    let duration: TimeInterval? // For podcast length
     
+    var localLogoAssetName: String? {
+        switch sourceName {
+        case "WrestleTalk":
+            return "wrestletalkLogo"
+        default:
+            return nil
+        }
+    }
+    
     var timeAgo: String {
         guard let pubDate = pubDate else { return "Unknown" }
         let secondsAgo = Int(Date().timeIntervalSince(pubDate))

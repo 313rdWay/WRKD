@@ -21,7 +21,12 @@ struct ArticleListView: View {
             
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
-                    if let logoURL = article.sourceLogoURL {
+                    if let assetName = article.localLogoAssetName {
+                        Image(assetName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 78, height: 12)
+                    } else if let logoURL = article.sourceLogoURL {
                         UniversalImageView(urlString: logoURL.absoluteString,
                                            size: CGSize(width: 78, height: 12)
                         )
