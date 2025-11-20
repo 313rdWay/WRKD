@@ -76,7 +76,7 @@ struct Example: View {
 }
 
 #Preview {
-    let sampleArticle = RSSItem(title: "GCW Debuting In Witchita, WWE Raw Highlights, More | Fight Size", description: "This is a sample descripton for the article used in the preview.", link: "https://www.fightful.com/wrestling/gcw-wwe-raw-260178", thumbnailURL: URL(string: "https://d1fcaprh3kb5t7.cloudfront.net/wp-content/uploads/2025/10/07172006/G2nvYqcW0AAFR37-e1759872037909.jpg"), sourceName: "FIghtful", sourceLogoURL: URL(string: "https://d1fcaprh3kb5t7.cloudfront.net/wp-content/uploads/2025/06/26001949/footer-logo.svg"), pubDate: Date())
+    let sampleArticle = RSSItem(title: "GCW Debuting In Witchita, WWE Raw Highlights, More | Fight Size", description: "This is a sample descripton for the article used in the preview.", link: "https://www.fightful.com/wrestling/gcw-wwe-raw-260178", thumbnailURL: URL(string: "https://d1fcaprh3kb5t7.cloudfront.net/wp-content/uploads/2025/10/07172006/G2nvYqcW0AAFR37-e1759872037909.jpg"), sourceName: "FIghtful", sourceLogoURL: URL(string: "https://d1fcaprh3kb5t7.cloudfront.net/wp-content/uploads/2025/06/26001949/footer-logo.svg"), pubDate: Date(), author: "Jeremy Lambert")
     
     Example(article: sampleArticle)
 }

@@ -22,6 +22,7 @@ class RSSParser: NSObject, XMLParserDelegate {
     private var currentLink: String = ""
     private var currentThumbnailURL: URL?
     private var currentPubDate: Date?
+    private var currentAuthor: String = ""
     
     private var completionHandler: (([RSSItem]) -> Void)?
     
@@ -43,6 +44,7 @@ class RSSParser: NSObject, XMLParserDelegate {
             currentLink = ""
             currentThumbnailURL = nil
             currentPubDate = nil
+            currentAuthor = ""
         }
         
         // Detect feed image tags (for other sites too)
@@ -100,22 +102,15 @@ class RSSParser: NSObject, XMLParserDelegate {
                     break
                 }
             }
+        case "author", "dc:creator":
+            currentAuthor += trimmed
+        
         default:
             break
         }
     }
     
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-//        if elementName == "content:encoded", currentThumbnailURL == nil {
-//            do {
-//                let doc = try SwiftSoup.parse(currentDescription)
-//                if let imgSrc = try doc.select("img").first()?.attr("src"), let url = URL(string: imgSrc) {
-//                    currentThumbnailURL = url
-//                }
-//            } catch {
-//                print("⚠️ SwiftSoup failed:", error.localizedDescription)
-//            }
-//        }
         if elementName == "content:encoded" {
             do {
                 let doc = try SwiftSoup.parse(currentDescription)
@@ -144,7 +139,8 @@ class RSSParser: NSObject, XMLParserDelegate {
                 thumbnailURL: currentThumbnailURL,
                 sourceName: self.sourceName,
                 sourceLogoURL: self.sourceLogoURL,
-                pubDate: currentPubDate ?? Date()
+                pubDate: currentPubDate ?? Date(),
+                author: currentAuthor.isEmpty ? nil : currentAuthor
             )
             items.append(newItem)
         }

@@ -80,7 +80,8 @@ class RSSFeedViewModel: ObservableObject {
                         thumbnailURL: newURL,
                         sourceName: old.sourceName,
                         sourceLogoURL: old.sourceLogoURL,
-                        pubDate: old.pubDate
+                        pubDate: old.pubDate,
+                        author: old.author
                     )
                     updatedItems[index] = newItem
                 }
@@ -121,7 +122,8 @@ class RSSFeedViewModel: ObservableObject {
                                 thumbnailURL: url,   // 🔁 override with best guess
                                 sourceName: old.sourceName,
                                 sourceLogoURL: old.sourceLogoURL,
-                                pubDate: old.pubDate
+                                pubDate: old.pubDate,
+                                author: old.author
                             )
                             updatedItems[index] = newItem
                         }

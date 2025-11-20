@@ -17,10 +17,11 @@ struct RSSItem: Identifiable {
     let sourceName: String?
     let sourceLogoURL: URL?
     let pubDate: Date?
+    let author: String?
     
     // For future use
-//    let mediaURL: URL? // For podcast audio or video files
-//    let duration: TimeInterval? // For podcast length
+    //    let mediaURL: URL? // For podcast audio or video files
+    //    let duration: TimeInterval? // For podcast length
     
     var localLogoAssetName: String? {
         switch sourceName {
@@ -49,5 +50,37 @@ struct RSSItem: Identifiable {
         default:
             return "\(secondsAgo / 31536000)y ago"
         }
+    }
+    
+    var displayAuthor: String? {
+        guard var raw = author?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
+            return sourceName
+        }
+        
+        if sourceName == "Wrestling Inc" {
+            if let open = raw.firstIndex(of: "("),
+               let close = raw.firstIndex(of: ")"),
+               open < close {
+                let nameRange = raw.index(after: open)..<close
+                let name = raw[nameRange].trimmingCharacters(in: .whitespacesAndNewlines)
+                if !name.isEmpty {
+                    raw = name
+                }
+            }
+            
+            if let emailRange = raw.range(
+                of: #"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}"#,
+                options: [.regularExpression, .caseInsensitive]
+            ) {
+                raw.removeSubrange(emailRange)
+                raw = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+        }
+        
+        if raw.isEmpty {
+            return sourceName
+        }
+        
+        return raw
     }
 }
