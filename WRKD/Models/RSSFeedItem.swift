@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct RSSItem: Identifiable {
+struct RSSItem: Identifiable, Hashable {
     let id = UUID()
     let title: String
     let description: String
@@ -19,7 +19,7 @@ struct RSSItem: Identifiable {
     let pubDate: Date?
     let author: String?
     
-    // For future use
+    // TODO: Future use
     //    let mediaURL: URL? // For podcast audio or video files
     //    let duration: TimeInterval? // For podcast length
     
@@ -27,6 +27,10 @@ struct RSSItem: Identifiable {
         switch sourceName {
         case "WrestleTalk":
             return "wrestletalkLogo"
+        case "Fightful":
+            return "fightfulLogo"
+        case "Wrestling Inc":
+            return "wrestlingIncLogo"
         default:
             return nil
         }

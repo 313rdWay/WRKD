@@ -14,7 +14,6 @@ import CryptoKit
 class UniversalImageLoader: ObservableObject {
     @Published var image: UIImage?
 
-//    static var cache = [String: UIImage]()
     // Mark: - Caches
     
     // In memory cache (fast temporary)

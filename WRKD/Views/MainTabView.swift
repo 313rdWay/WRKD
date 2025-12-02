@@ -28,6 +28,7 @@ struct MainTabView: View {
                 Tab("Podcasts", systemImage: "waveform.circle.fill") {
                     NavigationStack {
                         PodcastFeedView()
+                        
                     }
                 }
                 

@@ -14,7 +14,9 @@ struct ArticleStyleConstants {
     
     static let titleFontLarge = Font.system(size: 18, weight: .regular, design: .default)
     static let titleFontCompact = Font.system(size: 16, weight: .regular, design: .default)
+    static let titleFontSmall = Font.system(size: 12, weight: .regular, design: .default)
     static let subtitleFont = Font.system(size: 12, weight: .regular, design: .default)
+    static let subtitleFontSmall = Font.system(size: 9, weight: .regular, design: .default)
     static let linelimit = 3
     
     static let titleForeground = Color("primaryText")

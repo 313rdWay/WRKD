@@ -9,23 +9,9 @@ import SwiftUI
 import WebKit
 
 struct ArticleWebView: View {
-//    let url: URL
     let urlString: String
     
     var body: some View {
-//        WebView(url: url)
-//            .navigationTitle(url.host ?? "Article") // shows domain name, e.g., fightful.com
-//            .navigationBarTitleDisplayMode(.inline)
-//            .toolbar {
-//                ToolbarItem(placement: .bottomBar) {
-//                    Button {
-//                        UIApplication.shared.open(url)
-//                    } label: {
-//                        Image(systemName: "safari")
-//                    }
-//                    .accessibilityLabel("Open in Browser")
-//                }
-//            }
         if let url = Self.makeURL(from: urlString) {
             WebView(url: url)
                 .navigationTitle(url.host ?? "Article")
@@ -52,8 +38,8 @@ struct WebView: UIViewRepresentable {
     }
 }
 
-//#Preview {
-//    NavigationStack {
-//        ArticleWebView(url: URL(string: "http://www.fightful.com")!)
-//    }
-//}
+#Preview {
+    NavigationStack {
+        ArticleWebView(urlString: "http://www.fightful.com")
+    }
+}

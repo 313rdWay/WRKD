@@ -1,33 +1,38 @@
 //
-//  Example.swift
+//  ArticleListView.swift
 //  WRKD
 //
-//  Created by Davaughn Williams on 10/27/25.
+//  Created by Davaughn Williams on 10/20/25.
 //
 
 import SwiftUI
 
-struct Example: View {
-    @StateObject var vm = RSSFeedViewModel()
+struct ArticleListCard: View {
+    @Environment(\.openURL) private var openURL
     
-//    let article: RSSItem
+    let article: RSSItem
     
     var body: some View {
-        List(vm.items) { item in
+        ZStack {
+            RoundedRectangle(cornerRadius: 25)
+                .fill(Color("tertiaryBG"))
+                .frame(height: 135)
+                .frame(maxWidth: .infinity)
+            
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
-                    if let assetName = item.localLogoAssetName {
+                    if let assetName = article.localLogoAssetName {
                         Image(assetName)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 78, height: 12)
-                    } else if let logoURL = item.sourceLogoURL {
+                            .frame(height: 12)
+                    } else if let logoURL = article.sourceLogoURL {
                         UniversalImageView(urlString: logoURL.absoluteString,
                                            size: CGSize(width: 78, height: 12)
                         )
                     }
                     
-                    Text(item.title)
+                    Text(article.title)
                         .font(ArticleStyleConstants.titleFontCompact)
                         .lineLimit(ArticleStyleConstants.linelimit)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -35,23 +40,22 @@ struct Example: View {
                     
                     
                     HStack {
-                        Text(item.timeAgo)
+                        Text(article.timeAgo)
                             .font(ArticleStyleConstants.subtitleFont)
                             .foregroundStyle(ArticleStyleConstants.subtitleForeground)
                         
                         Divider()
                             .frame(height: 10)
                         
-                        if let byline = item.displayAuthor {
+                        if let byline = article.displayAuthor {
                             Text(byline)
                                 .font(ArticleStyleConstants.subtitleFont)
                                 .foregroundStyle(ArticleStyleConstants.subtitleForeground)
                         }
-
                     }
                     
                 }
-                if let thumbnailURL = item.thumbnailURL {
+                if let thumbnailURL = article.thumbnailURL {
                     AsyncImage(url: thumbnailURL) { phase in
                         switch phase {
                         case .empty:
@@ -85,15 +89,20 @@ struct Example: View {
             }
             .padding(.horizontal)
         }
-        .onAppear {
-            vm.loadFeeds()
-//            vm.testLogoFetch(for: "https://www.fightful.com/sites/default/files/fightful-share-logo.png")
-        }
+        .articleContainer()
     }
 }
 
 #Preview {
-    let sampleArticle = RSSItem(title: "GCW Debuting In Witchita, WWE Raw Highlights, More | Fight Size", description: "This is a sample descripton for the article used in the preview.", link: "https://www.fightful.com/wrestling/gcw-wwe-raw-260178", thumbnailURL: URL(string: "https://d1fcaprh3kb5t7.cloudfront.net/wp-content/uploads/2025/10/07172006/G2nvYqcW0AAFR37-e1759872037909.jpg"), sourceName: "FIghtful", sourceLogoURL: URL(string: "https://d1fcaprh3kb5t7.cloudfront.net/wp-content/uploads/2025/06/26001949/footer-logo.svg"), pubDate: Date(), author: "Jeremy Lambert")
+    let sampleArticle = RSSItem(
+        title: "GCW Debuting In Witchita, WWE Raw Highlights, More | Fight Size",
+        description: "This is a sample descripton for the article used in the preview.",
+        link: "https://www.fightful.com/wrestling/gcw-wwe-raw-260178",
+        thumbnailURL: URL(string: "https://d1fcaprh3kb5t7.cloudfront.net/wp-content/uploads/2025/10/07172006/G2nvYqcW0AAFR37-e1759872037909.jpg"),
+        sourceName: "FIghtful",
+        sourceLogoURL: URL(string: "https://d1fcaprh3kb5t7.cloudfront.net/wp-content/uploads/2025/06/26001949/footer-logo.svg"),
+        pubDate: Date(),
+        author: "Jeremy Lambert")
     
-    Example(/*article: sampleArticle*/)
+    ArticleListCard(article: sampleArticle)
 }
