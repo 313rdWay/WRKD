@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct ArticleListCard: View {
-    @Environment(\.openURL) private var openURL
-    
     let article: RSSItem
     
     var body: some View {

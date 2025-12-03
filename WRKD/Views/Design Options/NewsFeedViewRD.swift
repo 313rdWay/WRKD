@@ -139,7 +139,7 @@ extension NewsFeedViewRD {
 //                    .padding(.leading, 20)
                 
                 ForEach(regularArticles) { article in
-                    if ArticleWebView.makeURL(from: article.link) != nil {
+                    if ArticleWebViewOG.makeURL(from: article.link) != nil {
                         NavigationLink {
                             ArticleWebView(urlString: article.link)
                                 .toolbar(.hidden, for: .tabBar)

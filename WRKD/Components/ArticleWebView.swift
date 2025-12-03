@@ -6,40 +6,37 @@
 //
 
 import SwiftUI
-import WebKit
+import SafariServices
 
-struct ArticleWebView: View {
+struct ArticleWebView: UIViewControllerRepresentable {
+
     let urlString: String
     
-    var body: some View {
-        if let url = Self.makeURL(from: urlString) {
-            WebView(url: url)
-                .navigationTitle(url.host ?? "Article")
-        } else {
-            ContentUnavailableView("Invalid link", systemImage: "exclamationmark.triangle")
-        }
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        // Safely build the URL
+        let url = URL(string: urlString) ?? URL(string: "https://google.com")!
+        
+        // Configure Safari so it auto-enters the Reader when possible
+        let config = SFSafariViewController.Configuration()
+        config.entersReaderIfAvailable = true
+        
+        let safariVC = SFSafariViewController(url: url, configuration: config)
+        
+//        safariVC.preferredBarTintColor = UIColor(named: "secondaryBG")
+//        safariVC.preferredControlTintColor = UIColor(named: "primaryColor")
+        
+        safariVC.dismissButtonStyle = .close
+        
+        return safariVC
     }
-    static func makeURL(from s: String) -> URL? {
-        guard var comps = URLComponents(string: s.trimmingCharacters(in: .whitespacesAndNewlines)) else { return nil }
-        if comps.scheme == nil { comps.scheme = "https" }
-        return comps.url
-    }
+    
+    // SFSafariViewController doesn’t support changing the URL after creation, so this stays empty.
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) { }
 }
 
-struct WebView: UIViewRepresentable {
-    let url: URL
-    func makeUIView(context: Context) -> WKWebView {
-        WKWebView()
-    }
-    func updateUIView(_ uiView: WKWebView, context: Context) {
-        DispatchQueue.main.async {
-            uiView.load(URLRequest(url: url))
-        }
-    }
-}
 
 #Preview {
     NavigationStack {
-        ArticleWebView(urlString: "http://www.fightful.com")
+        ArticleWebView(urlString: "https://www.fightful.com/wrestling/bayley-on-being-a-wwe-locker-room-leader-its-not-something-that-i-asked-for-these-idiots-need-guidance/")
     }
 }

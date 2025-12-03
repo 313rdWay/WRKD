@@ -126,7 +126,7 @@ extension NewsFeedViewRD2 {
                     HStack(spacing: -275) {
                     ForEach(featuredArticles) { article in
                         
-                        if ArticleWebView.makeURL(from: article.link) != nil {
+                        if ArticleWebViewOG.makeURL(from: article.link) != nil {
                             NavigationLink {
                                 ArticleWebView(urlString: article.link)
                                     .toolbar(.hidden, for: .tabBar)
@@ -157,7 +157,7 @@ extension NewsFeedViewRD2 {
 //                    .padding(.leading, 20)
                 
                 ForEach(regularArticles) { article in
-                    if ArticleWebView.makeURL(from: article.link) != nil {
+                    if ArticleWebViewOG.makeURL(from: article.link) != nil {
                         NavigationLink {
                             ArticleWebView(urlString: article.link)
                                 .toolbar(.hidden, for: .tabBar)

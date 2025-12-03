@@ -117,7 +117,7 @@ extension NewsFeedViewOG {
                 VStack {
                     TabView(selection: $selection) {
                         ForEach(featuredArticles) { article in
-                            if ArticleWebView.makeURL(from: article.link) != nil {
+                            if ArticleWebViewOG.makeURL(from: article.link) != nil {
                                 NavigationLink {
                                     ArticleWebView(urlString: article.link)
                                         .toolbar(.hidden, for: .tabBar)
@@ -147,7 +147,7 @@ extension NewsFeedViewOG {
                     .padding(.leading, 20)
                 
                 ForEach(regularArticles) { article in
-                    if ArticleWebView.makeURL(from: article.link) != nil {
+                    if ArticleWebViewOG.makeURL(from: article.link) != nil {
                         NavigationLink {
                             ArticleWebView(urlString: article.link)
                                 .toolbar(.hidden, for: .tabBar)

@@ -9,18 +9,10 @@ import SwiftUI
 
 struct NewsFeedView: View {
     @StateObject private var vm = RSSFeedViewModel()
-    
-    let promotions: [String] = ["ALL", "WWE", "AEW", "NJPW"]
-    
-    @State private var selection = 0
-    @State private var showPreviousCard = false
     let stories = Array(0..<3)
     
-    @State private var selectedFeaturedArticle: RSSItem?
-    
-    @State var selectedTab: Int = 0
-    @State private var selectedPromotion: String? = "ALL"
-    
+    @State private var activeArticleURL: String? = nil
+        
     var featuredArticles: [RSSItem] {
         Array(vm.items.prefix(2)) // first 2 items
     }
@@ -32,23 +24,32 @@ struct NewsFeedView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // background layer
+                // MARK: Background Layer
                 Color("primaryBG")
                     .ignoresSafeArea(.all)
-                
+                // MARK: Content
                 VStack {
                     header
-                    
-//                    filterOptions
                     
                     articlesScrollView
                     
                 }
             }
-            .navigationDestination(item: $selectedFeaturedArticle) { article in
-                ArticleWebView(urlString: article.link)
-                    .toolbar(.hidden, for: .tabBar)
-            }
+            .fullScreenCover(
+                isPresented: Binding(
+                    get: { activeArticleURL != nil },
+                    set: { isPresented in
+                        if !isPresented {
+                            activeArticleURL = nil
+                        }
+                    }
+                )
+            ) {
+                if let urlString = activeArticleURL {
+                    ArticleWebView(urlString: urlString)
+                        .ignoresSafeArea()
+                }
+                    }
         }
         .onAppear {
             vm.loadFeedIfNeeded()
@@ -90,33 +91,7 @@ extension NewsFeedView {
             }
         }
     }
-    
-    
-    
-//    private var filterOptions: some View {
-//        HStack(spacing: 10) {
-//            ForEach(promotions, id: \.self) { promotion in
-//                
-//                Button {
-//                    if selectedPromotion == promotion {
-//                        selectedPromotion = nil
-//                    } else {
-//                        selectedPromotion = promotion
-//                    }
-//                } label: {
-//                    RoundedRectangle(cornerRadius: 8)
-//                        .fill(selectedPromotion == promotion ? Color("primaryColor") : Color("tertiaryBG"))
-//                        .frame(width: 80, height: 44)
-//                        .overlay{
-//                            Text(promotion)
-//                                .foregroundStyle(Color("primaryText"))
-//                                .font(.system(size: 17.5, weight: .semibold, design: .default))
-//                         }
-//                }
-//            }
-//        }
-//    }
-    
+
     private var articlesScrollView: some View {
         ScrollView(.vertical) {
             
@@ -129,22 +104,12 @@ extension NewsFeedView {
                 
                 HStack(alignment: .center, spacing: 8) {
                     ForEach(featuredArticles) { article in
-                        
-                        if ArticleWebView.makeURL(from: article.link) != nil {
-                            NavigationLink {
-                                ArticleWebView(urlString: article.link)
-                                    .toolbar(.hidden, for: .tabBar)
-                            } label: {
-                                ArticlePreviewCard(article: article)
-                            }
-                            .buttonStyle(.plain)
-                        } else {
-                            // fallback if it's invalid
+                        Button {
+                            activeArticleURL = article.link
+                        } label: {
                             ArticlePreviewCard(article: article)
-                                .onTapGesture {
-                                    print("⚠️ Invalid or missing URL for \(article.title)")
-                                }
                         }
+                        .buttonStyle(.plain)
                     }
                 }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -156,20 +121,12 @@ extension NewsFeedView {
             // Regular Stories
             LazyVStack(alignment: .leading, spacing: 0) {
                 ForEach(regularArticles) { article in
-                    if ArticleWebView.makeURL(from: article.link) != nil {
-                        NavigationLink {
-                            ArticleWebView(urlString: article.link)
-                                .toolbar(.hidden, for: .tabBar)
-                        } label: {
-                            ArticleListCard(article: article)
-                        }
-                        .buttonStyle(.plain)
-                    } else {
+                    Button {
+                        activeArticleURL = article.link
+                    } label: {
                         ArticleListCard(article: article)
-                            .onTapGesture {
-                                print("⚠️ Invalid or missing URL for \(article.title)")
-                            }
                     }
+                    .buttonStyle(.plain)
                 }
             }
         }
