@@ -22,6 +22,6 @@ struct ArticleReaderScreen: View {
 
 #Preview {
     NavigationStack {
-        ArticleReaderScreen(urlString: "https://www.fightful.com")
+        ArticleReaderScreen(urlString: "https://www.fightful.com/wrestling/bayley-on-being-a-wwe-locker-room-leader-its-not-something-that-i-asked-for-these-idiots-need-guidance/")
     }
 }

@@ -26,6 +26,9 @@ class RSSParser: NSObject, XMLParserDelegate {
     
     private var completionHandler: (([RSSItem]) -> Void)?
     
+    private var insideAuthor = false
+    private var isAtomFeed = false
+    
     func parse(data: Data, completion: @escaping ([RSSItem]) -> Void) {
         let parser = XMLParser(data: data)
         self.completionHandler = completion
@@ -35,10 +38,14 @@ class RSSParser: NSObject, XMLParserDelegate {
     
     // MARK: - XMLParser Delegate
     func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
-        currentElement = elementName
+//        currentElement = elementName
+//        let name = elementName.components(separatedBy: ":").last ?? elementName
+        let raw = elementName
+        let name = raw.components(separatedBy: ":").last ?? raw
+        currentElement = name
         
         // Reset when a new <item> begins
-        if elementName == "item" {
+        if name == "item" || name == "entry" {
             currentTitle = ""
             currentDescription = ""
             currentLink = ""
@@ -47,16 +54,32 @@ class RSSParser: NSObject, XMLParserDelegate {
             currentAuthor = ""
         }
         
+        if name == "feed" && namespaceURI == "http://www.w3.org/2005/Atom" {
+            isAtomFeed = true
+        }
+        
+        // Atom: <link rel="alternate" href="https://..."/>
+        if name == "link", let href = attributeDict["href"] {
+            // Prefer the "alternate" link (the actual article)
+            let rel = attributeDict["rel"] ?? "alternate"
+            if rel == "alternate" {
+                currentLink = href
+            }
+        }
+        
         // Detect feed image tags (for other sites too)
-        if elementName == "media:content" ||
-            elementName == "media:thumbnail" ||
-            elementName == "enclosure" {
+        if raw == "media:content" ||
+            raw == "media:thumbnail" ||
+            name == "enclosure" {
             
             if let urlString = attributeDict["url"], let url = URL(string: urlString) {
                 currentThumbnailURL = url
                 print("📸 Found featured image tag: \(urlString)")
             }
         }
+        
+        if name == "author" { insideAuthor = true }
+
     }
     
     func parser(_ parser: XMLParser, foundCharacters string: String) {
@@ -66,7 +89,7 @@ class RSSParser: NSObject, XMLParserDelegate {
         switch currentElement {
         case "title":
             currentTitle += trimmed
-        case "description", "content:encoded":
+        case "description", "content:encoded", "summary", "content":
             currentDescription += trimmed
 
             // Detect feed image tags (for other sites too)
@@ -84,26 +107,58 @@ class RSSParser: NSObject, XMLParserDelegate {
             }
         case "link":
             currentLink += trimmed
-        case "pubDate":
+        case "pubDate", "updated", "published":
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: "en_US_POSIX")
             formatter.timeZone = TimeZone(secondsFromGMT: 0)
             
             // Tries common RSS date formats
             let formats = [
-                "E, dd MMM yyyy HH:mm:ss Z",
-                "E, d MMM yyyy HH:mm:ss Z",
+                "EEE, dd MMM yyyy HH:mm:ss Z", // Standard RFC822 with numeric offset
+                
+                "E, d MMM yyyy HH:mm:ss Z", // Single-digit day variant
+                
+                "EEE, dd MMM yyyy HH:mm:ss z", // Time xone abbreviation (e.g. EST/EDT)
+                
+                "E, d MMM yyyy HH:mm:ss z", // Single digit day + abbrev
+                
+                "yyyy-MM-dd'T'HH:mm:ssZ", // ISO8601 without fractional seconds
+                
+                "yyyy-MM-dd'T'HH:mm:ss.SSSZ", // ISO8601 with fractional seconds
+                
                 "yyyy=MM-dd'T'HH:mm:ssZ"
             ]
+            
+            var parsedDate: Date? = nil
+            
             for format in formats {
                 formatter.dateFormat = format
                 if let date = formatter.date(from: trimmed) {
-                    currentPubDate = date
+                    parsedDate = date
                     break
                 }
             }
+            
+            if let date = parsedDate {
+                currentPubDate = date
+                
+                if sourceName == "Wrestling Observer" {
+                    print("📅 Wrestling Observer raw pubDate: \(trimmed)")
+                    print("👉 Parsed as: \(date)")
+                    print("👉 Now: \(Date())")
+                    print("👉 secondsAgo: \(Int(Date().timeIntervalSince(date)))")
+                }
+            } else {
+                print("⚠️ Could not parse pubDate: \(trimmed)")
+            }
+            
         case "author", "dc:creator":
             currentAuthor += trimmed
+            
+        case "name":
+            if insideAuthor {
+                currentAuthor += trimmed
+            }
         
         default:
             break
@@ -111,7 +166,9 @@ class RSSParser: NSObject, XMLParserDelegate {
     }
     
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        if elementName == "content:encoded" {
+        let name = elementName.components(separatedBy: ":").last ?? elementName
+        
+        if name == "content:encoded" {
             do {
                 let doc = try SwiftSoup.parse(currentDescription)
 
@@ -128,7 +185,7 @@ class RSSParser: NSObject, XMLParserDelegate {
         }
         
         // When an <item> ends, finalize and append
-        if elementName == "item" {
+        if name == "item" || name == "entry" {
             print("🧠 Thumbnail found:", currentThumbnailURL?.absoluteString ?? "none")
             print("📰 Title:", currentTitle)
             print("🔗 Source logo:", self.sourceLogoURL?.absoluteString ?? "none")
@@ -144,6 +201,9 @@ class RSSParser: NSObject, XMLParserDelegate {
             )
             items.append(newItem)
         }
+        
+        if name == "author" { insideAuthor = false }
+
     }
     
     func parserDidEndDocument(_ parser: XMLParser) {
@@ -156,15 +216,35 @@ func fetchRSSFeed(source: RSSSource, completion: @escaping (Result<[RSSItem], Er
     let task = URLSession.shared.dataTask(with: source.feedURL) { data, response, error in
         if let error = error {
             completion(.failure(error))
+            print("❌ \(source.name) network error:", error.localizedDescription)
+            completion(.failure(error))
             return
         }
+        
+        // ✅ DEBUG: HTTP status + content type
+        if let http = response as? HTTPURLResponse {
+            print("📡 \(source.name) status:", http.statusCode,
+                  "content-type:", http.value(forHTTPHeaderField: "Content-Type") ?? "nil")
+        }
+        
         guard let data = data else {
-            completion(.failure(NSError(domain: "RSSFeedError", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+            completion(.failure(NSError(
+                domain: "RSSFeedError",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey: "No data received"]
+            )))
             return
         }
+        
+        // ✅ DEBUG: show what you actually downloaded
+        let preview = String(data: data, encoding: .utf8) ?? ""
+        print("🧾 \(source.name) first 200 chars:\n\(preview.prefix(200))")
+        
+        
         let parser = RSSParser()
         parser.sourceName = source.name
         parser.sourceLogoURL = source.logoURL
+        
         parser.parse(data: data) { items in
             completion(.success(items))
         }

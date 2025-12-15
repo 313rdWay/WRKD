@@ -57,6 +57,11 @@ struct ArticlePreviewCard: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 78, height: 12)
+                    }else  if let logoURL = article.sourceLogoURL {
+                        UniversalImageView(
+                            urlString: logoURL.absoluteString,
+                            size: CGSize(width: 78, height: 12)
+                        )
                     }
                     
                     Spacer()

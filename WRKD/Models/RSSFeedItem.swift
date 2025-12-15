@@ -31,6 +31,14 @@ struct RSSItem: Identifiable, Hashable {
             return "fightfulLogo"
         case "Wrestling Inc":
             return "wrestlingIncLogo"
+        case "Wrestling Observer":
+            return "wrestlingObserverLogo"
+        case "Cageside Seats":
+            return "cagesideSeatsLogo"
+        case "ITR Wrestling":
+            return "itrWrestlingLogo"
+        case "Daily DDT":
+            return "dailyDDTLogo"
         default:
             return nil
         }
@@ -38,6 +46,8 @@ struct RSSItem: Identifiable, Hashable {
     
     var timeAgo: String {
         guard let pubDate = pubDate else { return "Unknown" }
+        
+        let rawSeconds = Int(Date().timeIntervalSince(pubDate))
         let secondsAgo = Int(Date().timeIntervalSince(pubDate))
         
         switch secondsAgo {
